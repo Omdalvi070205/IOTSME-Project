@@ -1,0 +1,3194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Electricity Meter - Complete Management System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* --- Global Styles & Variables --- */
+        :root {
+            --primary-color: #007bff;
+            --primary-hover: #0056b3;
+            --secondary-color: #6c757d;
+            --secondary-hover: #5a6268;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --info-color: #17a2b8;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --background-color: #f4f7fc;
+            --card-bg: #ffffff;
+            --text-color: #333;
+            --text-muted: #6c757d;
+            --border-color: #dee2e6;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --border-radius: 8px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            transition: background-color 0.3s;
+        }
+
+        /* --- Utility Classes --- */
+        .container {
+            width: 90%;
+            max-width: 1400px;
+            margin: auto;
+            padding: 2rem 0;
+        }
+
+        .section {
+            display: none;
+            padding: 2rem 0;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- Typography --- */
+        h1,
+        h2,
+        h3,
+        h4 {
+            margin-bottom: 1rem;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+        }
+
+        h2 {
+            font-size: 2rem;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: var(--text-muted);
+        }
+
+        /* --- Buttons --- */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn:disabled {
+            background-color: var(--secondary-color);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: #fff;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: #fff;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--secondary-hover);
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: #fff;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        .btn-small {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+        }
+
+        /* --- Forms --- */
+        .input-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+        }
+
+        .input-group input:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+        }
+
+        /* --- Navigation Bar --- */
+        .navbar {
+            background-color: var(--card-bg);
+            box-shadow: var(--shadow);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 90%;
+            max-width: 1400px;
+            margin: auto;
+        }
+
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .nav-logo i {
+            margin-right: 0.5rem;
+        }
+
+        .nav-menu {
+            list-style: none;
+            display: flex;
+        }
+
+        .nav-item {
+            margin: 0 1rem;
+        }
+
+        .nav-link {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 0;
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary-color);
+            transition: width 0.3s;
+        }
+
+        .nav-link.active,
+        .nav-link:hover {
+            color: var(--primary-color);
+        }
+
+        .nav-link.active::after,
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .nav-user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-name {
+            font-weight: 600;
+        }
+
+        .user-role {
+            background: #e9ecef;
+            padding: 0.2rem 0.6rem;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+        }
+
+        .btn-logout,
+        .btn-login {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--dark-color);
+        }
+
+        .hamburger {
+            display: none;
+            cursor: pointer;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 25px;
+            height: 3px;
+            margin: 5px 0;
+            background-color: var(--dark-color);
+            transition: all 0.3s;
+        }
+
+        /* --- Modals --- */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.6);
+            animation: fadeIn 0.3s;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            margin: 5% auto;
+            padding: 2.5rem;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .close-modal {
+            color: #aaa;
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close-modal:hover {
+            color: var(--dark-color);
+        }
+
+        /* --- Smart Energy Meter Logo Styles --- */
+        .login-logo {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1.5rem 0;
+        }
+
+        .logo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .meter-icon {
+            position: relative;
+            width: 120px;
+            height: 80px;
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+            border: 3px solid #ddd;
+        }
+
+        .meter-icon i.fa-bolt {
+            font-size: 2.5rem;
+            color: #fbbf24;
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.7;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .meter-display {
+            position: absolute;
+            right: 0.5rem;
+            top: 0.5rem;
+            bottom: 0.5rem;
+            width: 50px;
+            background: #000;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid #333;
+        }
+
+        .lcd-screen {
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-align: center;
+            text-shadow: 0 0 5px #00ff00;
+        }
+
+        .power-reading {
+            display: block;
+            font-size: 0.9rem;
+        }
+
+        .unit {
+            display: block;
+            font-size: 0.6rem;
+            margin-top: -2px;
+        }
+
+        .meter-dots {
+            display: flex;
+            gap: 2px;
+            margin-top: 4px;
+        }
+
+        .dot {
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background: #333;
+        }
+
+        .dot.active {
+            background: #00ff00;
+            box-shadow: 0 0 3px #00ff00;
+        }
+
+        .company-name {
+            text-align: center;
+        }
+
+        .company-name h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .company-name p {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin: 0.5rem 0 0 0;
+            font-weight: 500;
+        }
+
+        /* --- Enhanced Login Styles --- */
+        .login-form h2 {
+            text-align: center;
+        }
+        .security-notice {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #1976d2;
+        }
+
+        .input-with-icon {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-with-icon i {
+            position: absolute;
+            left: 1rem;
+            color: var(--text-muted);
+            z-index: 1;
+        }
+
+        .input-with-icon input,
+        .input-with-icon select {
+            padding-left: 3rem;
+            width: 100%;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 1rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        .password-strength {
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .login-options {
+            margin: 1rem 0;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .login-spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ffffff40;
+            border-top: 2px solid #ffffff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .login-attempts {
+            background: #ffebee;
+            border: 1px solid #f44336;
+            color: #d32f2f;
+            padding: 0.8rem;
+            border-radius: var(--border-radius);
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .demo-credentials {
+            margin-top: 1.5rem;
+        }
+        .credential-group {
+            background: #f5f5f5;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            border-left: 4px solid var(--info-color);
+        }
+
+        .credential-group p {
+            margin: 0.5rem 0;
+        }
+
+        .credential-group code {
+            background: #e0e0e0;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .security-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* --- Authentication Settings Styles --- */
+        .auth-section {
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            background: #fafafa;
+        }
+
+        .auth-section h4 {
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .password-requirements {
+            margin-top: 0.5rem;
+        }
+
+        .strength-meter {
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+
+        .strength-meter::after {
+            content: '';
+            display: block;
+            height: 100%;
+            background: var(--danger-color);
+            width: 0%;
+            transition: all 0.3s;
+        }
+
+        .strength-weak::after {
+            width: 25%;
+            background: var(--danger-color);
+        }
+
+        .strength-fair::after {
+            width: 50%;
+            background: var(--warning-color);
+        }
+
+        .strength-good::after {
+            width: 75%;
+            background: var(--info-color);
+        }
+
+        .strength-strong::after {
+            width: 100%;
+            background: var(--success-color);
+        }
+
+        .password-match {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .password-match.match {
+            color: var(--success-color);
+        }
+
+        .password-match.no-match {
+            color: var(--danger-color);
+        }
+
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .toggle-label {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+            background: #ccc;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+
+        .toggle-switch input:checked+.toggle-label {
+            background: var(--success-color);
+        }
+
+        .toggle-switch input:checked+.toggle-label .toggle-switch-slider {
+            transform: translateX(26px);
+        }
+
+        .toggle-switch input {
+            display: none;
+        }
+
+        .setting-description {
+            margin-top: 0.5rem;
+            color: var(--text-muted);
+        }
+
+        /* --- Ideal Chart and Efficiency Styles --- */
+        .chart-controls {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            justify-content: center;
+        }
+
+        .chart-controls .btn-small {
+            padding: 0.4rem 1rem;
+            border: 1px solid var(--border-color);
+            background: white;
+            color: var(--text-color);
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+
+        .chart-controls .btn-small.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .chart-controls .btn-small:hover {
+            background: var(--primary-hover);
+            color: white;
+            border-color: var(--primary-hover);
+        }
+
+        .chart-legend {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+
+        .legend-color.ideal {
+            background: var(--success-color);
+        }
+
+        .legend-color.actual {
+            background: var(--primary-color);
+        }
+
+        .legend-color.savings {
+            background: var(--warning-color);
+        }
+
+        /* Efficiency Insights */
+        .efficiency-insights {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-top: 2rem;
+        }
+
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .insight-card {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            text-align: center;
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s;
+        }
+
+        .insight-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .insight-card i {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .insight-card h4 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+        }
+
+        .efficiency-score,
+        .peak-usage,
+        .potential-savings {
+            display: block;
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+        }
+
+        .efficiency-score {
+            color: var(--warning-color);
+        }
+
+        .peak-usage {
+            color: var(--danger-color);
+        }
+
+        .potential-savings {
+            color: var(--success-color);
+        }
+
+        .insight-card p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        /* --- AI Insights Section Styles --- */
+        .ai-insights, .ai-report {
+            background: linear-gradient(135deg, #e3f2fd, #f8f9fa);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-top: 2rem;
+            border-left: 4px solid var(--primary-color);
+            text-align: center;
+        }
+        .ai-insights h3, .ai-report h3 {
+            color: var(--primary-color);
+        }
+        .ai-insights p {
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            margin-bottom: 1.5rem;
+        }
+        .ai-result-container {
+            margin-top: 1.5rem;
+            text-align: left;
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            animation: fadeIn 0.5s;
+        }
+        .ai-result-container h4 {
+            margin-bottom: 1rem;
+            color: var(--dark-color);
+            text-align: center;
+        }
+        .ai-result-container ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .ai-result-container li {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--success-color);
+        }
+        .ai-result-container li:last-child {
+            margin-bottom: 0;
+        }
+        .ai-result-container li strong {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--dark-color);
+            font-weight: 600;
+        }
+        .ai-result-container li p, .ai-report-content p {
+            margin-bottom: 0;
+            color: var(--text-muted);
+        }
+        .modal-body ul {
+            list-style-position: inside;
+            padding-left: 0;
+        }
+        .modal-body li {
+            margin-bottom: 1rem;
+        }
+
+        /* --- Alert Settings Styles --- */
+        .checkbox-group-vertical {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .input-help {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            margin-top: 0.3rem;
+            display: block;
+        }
+
+        .email-config,
+        .sms-config {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .time-range {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .time-range input[type="time"] {
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+        }
+
+        /* --- Notification Animations --- */
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+
+        /* --- Dashboard --- */
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        /* Daily Usage Parameters Bar */
+        .daily-usage-bar {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            background: linear-gradient(135deg, var(--primary-color), var(--info-color));
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            margin: 2rem 0;
+            box-shadow: var(--shadow);
+            color: white;
+        }
+
+        .usage-param {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            min-width: 120px;
+            margin: 0.5rem;
+        }
+
+        .usage-param i {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.9;
+        }
+
+        .usage-param .param-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 0.3rem;
+        }
+
+        .usage-param .param-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .kpi-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .kpi-card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .kpi-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+        }
+
+        .kpi-value {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .kpi-unit {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-left: 0.2rem;
+        }
+
+        .kpi-trend {
+            font-size: 0.9rem;
+        }
+
+        .kpi-trend.up {
+            color: var(--success-color);
+        }
+
+        .kpi-trend.down {
+            color: var(--danger-color);
+        }
+
+        .realtime-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .gauge-card,
+        .parameter-card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .circular-gauge {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin: auto;
+        }
+
+        .gauge-value {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .gauge-value span {
+            display: block;
+        }
+
+        .gauge-value .unit {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        #voltageValue,
+        #currentValue,
+        #powerValue,
+        #powerFactorValue {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .parameter-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            text-align: left;
+        }
+
+        .param-icon {
+            font-size: 2rem;
+            color: var(--info-color);
+        }
+
+        .param-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .param-unit {
+            color: var(--text-muted);
+        }
+
+        .status-section {
+            display: flex;
+            justify-content: space-around;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .status-card {
+            background: var(--card-bg);
+            padding: 1rem 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        .status-indicator {
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        #connectivityStatus i {
+            color: var(--success-color);
+        }
+
+        #tamperStatus i {
+            color: var(--success-color);
+        }
+
+        #meterHealth i {
+            color: var(--success-color);
+        }
+
+        .charts-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .chart-container {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        /* --- Analytics Section --- */
+        .section-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .date-selector {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .date-controls {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        .chart-card.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .data-table-container {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        .table-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        #consumptionTable {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        #consumptionTable th,
+        #consumptionTable td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        #consumptionTable th {
+            font-weight: 600;
+        }
+
+        #consumptionTable tbody tr:hover {
+            background-color: var(--light-color);
+        }
+
+        /* --- Billing Section --- */
+        .current-bill,
+        .billing-history,
+        .calculator-section {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .bill-card .bill-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .bill-status {
+            padding: 0.3rem 0.8rem;
+            border-radius: 1rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .bill-status.pending {
+            background: var(--warning-color);
+            color: var(--dark-color);
+        }
+
+        .bill-status.paid {
+            background: var(--success-color);
+            color: #fff;
+        }
+
+        .bill-amount {
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 1rem 0;
+            color: var(--primary-color);
+        }
+
+        .bill-details .bill-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .pay-btn {
+            margin-top: 1.5rem;
+            width: 100%;
+        }
+
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            align-items: flex-end;
+        }
+
+        .calc-amount {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .billing-history table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .billing-history th,
+        .billing-history td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        /* --- Alerts & Notifications --- */
+        .active-alerts,
+        .alert-config,
+        .notification-history {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .alert-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            flex-wrap: wrap;
+        }
+        .alert-item .btn {
+            margin-left: auto;
+        }
+
+        .alert-item.high {
+            background: #f8d7da;
+            border-left: 5px solid var(--danger-color);
+        }
+
+        .alert-icon {
+            font-size: 1.5rem;
+            color: var(--danger-color);
+        }
+
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .config-card {
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+        }
+
+        .checkbox-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .notification-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .notif-icon {
+            font-size: 1.5rem;
+            padding: 0.5rem;
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            border-radius: 50%;
+            color: #fff;
+        }
+
+        .notif-icon.high {
+            background: var(--danger-color);
+        }
+
+        .notif-icon.medium {
+            background: var(--warning-color);
+        }
+
+        .notif-methods span {
+            font-size: 0.8rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            margin-left: 0.5rem;
+        }
+
+        .method.email {
+            background: #e0e0e0;
+        }
+
+        .method.sms {
+            background: #cce5ff;
+        }
+
+        .method.push {
+            background: #d4edda;
+        }
+
+        /* --- User Management & Settings --- */
+        .users-table table,
+        .settings-grid {
+            width: 100%;
+        }
+
+        .role {
+            padding: 0.2rem 0.6rem;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+            color: #fff;
+        }
+
+        .role.admin {
+            background: var(--danger-color);
+        }
+
+        .role.technician {
+            background: var(--info-color);
+        }
+
+        .role.user {
+            background: var(--secondary-color);
+        }
+
+        .status.active {
+            color: var(--success-color);
+        }
+
+        .status.inactive {
+            color: var(--text-muted);
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .settings-card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        .setting-item {
+            margin-bottom: 1rem;
+        }
+
+        /* --- Data Status Footer --- */
+        .data-status-footer {
+            background: var(--card-bg);
+            border-top: 2px solid var(--primary-color);
+            padding: 1rem 0;
+            position: sticky;
+            bottom: 0;
+            z-index: 100;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .data-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .data-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-color);
+        }
+
+        .data-item i {
+            color: var(--primary-color);
+            font-size: 1rem;
+        }
+
+        .data-quality {
+            display: flex;
+            align-items: center;
+        }
+
+        .quality-indicator {
+            background: var(--success-color);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        #connectionIcon.connected {
+            color: var(--success-color);
+        }
+
+        #connectionIcon.disconnected {
+            color: var(--danger-color);
+        }
+
+        #syncIcon {
+            animation: rotate 2s linear infinite;
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* --- Footer --- */
+        .footer {
+            background: var(--dark-color);
+            color: var(--light-color);
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        .footer-logo {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        /* --- Currency Switch Styles --- */
+        .currency-toggle {
+            margin: 0.5rem 0;
+        }
+
+        .currency-switch {
+            background: var(--info-color);
+            color: white;
+            border: none;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .currency-switch:hover {
+            background: #138496;
+            transform: scale(1.05);
+        }
+
+        /* --- Enhanced Responsive Design --- */
+        @media (max-width: 1023px) {
+            .nav-menu {
+                position: absolute;
+                top: 100%;
+                left: -100%;
+                width: 100%;
+                background-color: var(--card-bg);
+                flex-direction: column;
+                text-align: center;
+                box-shadow: var(--shadow);
+                transition: left 0.3s ease-in-out;
+                z-index: 999;
+            }
+
+            .nav-menu.active {
+                left: 0;
+            }
+
+            .nav-item {
+                margin: 1.5rem 0;
+            }
+
+            .hamburger {
+                display: block;
+            }
+
+            .hamburger.active span:nth-child(1) {
+                transform: rotate(45deg) translate(5px, 5px);
+            }
+
+            .hamburger.active span:nth-child(2) {
+                opacity: 0;
+            }
+
+            .hamburger.active span:nth-child(3) {
+                transform: rotate(-45deg) translate(7px, -6px);
+            }
+        }
+
+        @media (max-width: 767px) {
+            .container {
+                width: 95%;
+                padding: 1rem 0;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            h3 {
+                font-size: 1.3rem;
+            }
+
+            .nav-container {
+                width: 95%;
+            }
+
+            .nav-logo {
+                font-size: 1.2rem;
+            }
+
+            .nav-user-info {
+                display: none;
+            }
+
+            .kpi-section,
+            .realtime-grid,
+            .charts-section,
+            .analytics-grid,
+            .settings-grid,
+            .config-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .kpi-card {
+                flex-direction: column;
+                text-align: center;
+                padding: 1rem;
+            }
+
+            .kpi-icon {
+                font-size: 2rem;
+            }
+
+            .kpi-value {
+                font-size: 1.5rem;
+            }
+
+            .gauge-card,
+            .parameter-card,
+            .chart-card,
+            .settings-card {
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+            .circular-gauge {
+                width: 120px;
+                height: 120px;
+            }
+            #voltageValue, #currentValue, #powerValue, #powerFactorValue {
+                font-size: 1.5rem;
+            }
+            
+            .date-controls, .table-controls, .calculator-grid {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.5rem;
+            }
+
+            .date-controls .btn, .calculator-grid .btn {
+                width: 100%;
+                justify-content: center;
+                margin-top: 0.5rem;
+            }
+            
+            #consumptionTable, .billing-history table, .users-table table {
+                font-size: 0.9rem;
+                overflow-x: auto;
+                display: block;
+                white-space: nowrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal" style="display: block;">
+        <div class="modal-content">
+            <div class="login-form">
+                <!-- Smart Energy Meter Logo -->
+                <div class="login-logo">
+                    <div class="logo-container">
+                        <div class="meter-icon">
+                            <i class="fas fa-bolt"></i>
+                            <div class="meter-display">
+                                <div class="lcd-screen">
+                                    <span class="power-reading">1.23</span>
+                                    <span class="unit">kW</span>
+                                </div>
+                                <div class="meter-dots">
+                                    <span class="dot active"></span>
+                                    <span class="dot"></span>
+                                    <span class="dot active"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="company-name">
+                            <h1>Smart Energy Meter</h1>
+                            <p>Intelligent Power Monitoring System</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <h2><i class="fas fa-shield-alt"></i> Secure Authentication</h2>
+                <div class="security-notice">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Please authenticate to access the Smart Meter System</span>
+                </div>
+                <form id="loginForm" onsubmit="return handleLoginSubmit(event)">
+                    <div class="input-group">
+                        <label for="username">Username</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="username" required autocomplete="username" placeholder="Enter username">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="password">Password</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="password" required autocomplete="current-password" placeholder="Enter password">
+                            <button type="button" class="password-toggle" onclick="togglePassword()">
+                                <i class="fas fa-eye" id="passwordToggleIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="userRole">Access Level</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-user-tag"></i>
+                            <select id="userRole" required>
+                                <option value="">Select Role</option>
+                                <option value="user">User</option>
+                                <option value="admin">Administrator</option>
+                                <option value="technician">Technician</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="login-options">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="rememberMe">
+                            <span class="checkmark"></span>
+                            Remember me for 30 days
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary login-btn" id="loginBtn">
+                        <div class="login-spinner" id="loginSpinner" style="display: none;"></div>
+                        <i class="fas fa-sign-in-alt"></i> 
+                        <span id="loginBtnText">Secure Login</span>
+                    </button>
+                    <div class="login-attempts" id="loginAttempts" style="display: none;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span id="attemptsText"></span>
+                    </div>
+                </form>
+                <div class="demo-credentials">
+                    <h4><i class="fas fa-key"></i> Demo Access:</h4>
+                    <div class="credential-group">
+                        <p><strong>User:</strong> <code>user</code> / <code>password</code></p>
+                        <p><strong>Admin:</strong> <code>admin</code> / <code>admin123</code></p>
+                        <p><strong>Tech:</strong> <code>tech</code> / <code>tech123</code></p>
+                    </div>
+                </div>
+                <div class="security-footer">
+                    <p><i class="fas fa-shield-alt"></i> Your connection is secured with 256-bit encryption</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application (Hidden until authenticated) -->
+    <div id="mainApp" style="display: none;">
+    
+        <!-- Navigation Bar -->
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-logo">
+                    <i class="fas fa-bolt"></i>
+                    <span>Smart Meter System</span>
+                </div>
+                <ul class="nav-menu" id="navMenu">
+                    <li class="nav-item">
+                        <a href="#dashboard" class="nav-link active" data-section="dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#analytics" class="nav-link" data-section="analytics">Historical Analysis</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#billing" class="nav-link" data-section="billing">Billing & Payments</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#alerts" class="nav-link" data-section="alerts">Alerts & Notifications</a>
+                    </li>
+                    <li class="nav-item admin-only" style="display: none;">
+                        <a href="#users" class="nav-link" data-section="users">User Management</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#settings" class="nav-link" data-section="settings">Settings</a>
+                    </li>
+                </ul>
+                <div class="nav-user-info" id="userInfo" style="display: none;">
+                    <span class="user-name" id="userName">User</span>
+                    <span class="user-role" id="navUserRole">Guest</span>
+                    <button class="btn-logout" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- All Sections Go Here -->
+        <!-- Enhanced Dashboard Section -->
+        <section id="dashboard" class="section active">
+            <div class="container">
+                <div class="dashboard-header">
+                    <h1>Smart Meter Dashboard</h1>
+                    <p class="sub-headline">Real-time monitoring and comprehensive energy management</p>
+                    <div class="last-updated">Last updated: <span id="lastUpdated">--</span></div>
+                    
+                    <!-- Daily Usage Parameters Bar -->
+                    <div class="daily-usage-bar">
+                        <div class="usage-param">
+                            <i class="fas fa-calendar-day"></i>
+                            <span class="param-label">Today's Usage</span>
+                            <span class="param-value" id="dailyUsage">18.7 kWh</span>
+                        </div>
+                        <div class="usage-param">
+                            <i class="fas fa-clock"></i>
+                            <span class="param-label">Peak Hours</span>
+                            <span class="param-value" id="peakHours">19:00 - 21:00</span>
+                        </div>
+                        <div class="usage-param">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span class="param-label">Load Factor</span>
+                            <span class="param-value" id="loadFactor">78%</span>
+                        </div>
+                        <div class="usage-param">
+                            <i class="fas fa-chart-bar"></i>
+                            <span class="param-label">Efficiency</span>
+                            <span class="param-value" id="efficiency">92.5%</span>
+                        </div>
+                        <div class="usage-param">
+                            <i class="fas fa-thermometer-half"></i>
+                            <span class="param-label">Avg Demand</span>
+                            <span class="param-value" id="avgDemand">0.78 kW</span>
+                        </div>
+                        <div class="usage-param">
+                            <i class="fas fa-bolt"></i>
+                            <span class="param-label">Power Quality</span>
+                            <span class="param-value" id="powerQuality">Good</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KPI Overview -->
+                <div class="kpi-section">
+                    <div class="kpi-card">
+                        <div class="kpi-icon">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <div class="kpi-content">
+                            <h3>Current Month</h3>
+                            <span class="kpi-value" id="monthlyKwh">245.7</span>
+                            <span class="kpi-unit">kWh</span>
+                            <div class="kpi-trend up">
+                                <i class="fas fa-arrow-up"></i> 12% vs last month
+                            </div>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="kpi-content">
+                            <h3>Estimated Bill</h3>
+                            <span class="kpi-value" id="estimatedBill">$49.14</span>
+                            <div class="currency-toggle">
+                                <button id="currencyBtn" class="currency-switch" onclick="toggleCurrency()">Switch to ₹</button>
+                            </div>
+                            <div class="kpi-trend down">
+                                <i class="fas fa-arrow-down"></i> 5% vs last month
+                            </div>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="kpi-content">
+                            <h3>Peak Demand</h3>
+                            <span class="kpi-value" id="peakDemand">2.45</span>
+                            <span class="kpi-unit">kW</span>
+                            <div class="kpi-time">at 7:30 PM</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Real-time Parameters Grid -->
+                <div class="realtime-grid">
+                    <!-- Voltage Gauge -->
+                    <div class="gauge-card">
+                        <h4>Voltage</h4>
+                        <div class="circular-gauge">
+                            <canvas id="voltageGauge"></canvas>
+                            <div class="gauge-value">
+                                <span id="voltageValue">240.2</span>
+                                <span class="unit">V</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Current Gauge -->
+                    <div class="gauge-card">
+                        <h4>Current</h4>
+                        <div class="circular-gauge">
+                            <canvas id="currentGauge"></canvas>
+                            <div class="gauge-value">
+                                <span id="currentValue">5.8</span>
+                                <span class="unit">A</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Power Gauge -->
+                    <div class="gauge-card">
+                        <h4>Power</h4>
+                        <div class="circular-gauge">
+                            <canvas id="powerGauge"></canvas>
+                            <div class="gauge-value">
+                                <span id="powerValue">1.39</span>
+                                <span class="unit">kW</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Power Factor Gauge -->
+                    <div class="gauge-card">
+                        <h4>Power Factor</h4>
+                        <div class="circular-gauge">
+                            <canvas id="powerFactorGauge"></canvas>
+                            <div class="gauge-value">
+                                <span id="powerFactorValue">0.92</span>
+                                <span class="unit">PF</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Frequency Display -->
+                    <div class="parameter-card">
+                        <div class="param-icon">
+                            <i class="fas fa-wave-square"></i>
+                        </div>
+                        <div class="param-content">
+                            <h4>Frequency</h4>
+                            <span class="param-value" id="frequencyValue">50.02</span>
+                            <span class="param-unit">Hz</span>
+                        </div>
+                    </div>
+
+                    <!-- Energy Consumption -->
+                    <div class="parameter-card">
+                        <div class="param-icon">
+                            <i class="fas fa-battery-three-quarters"></i>
+                        </div>
+                        <div class="param-content">
+                            <h4>Energy Today</h4>
+                            <span class="param-value" id="energyTodayValue">18.7</span>
+                            <span class="param-unit">kWh</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status Indicators -->
+                <div class="status-section">
+                    <div class="status-card">
+                        <div class="status-indicator" id="connectivityStatus">
+                            <i class="fas fa-wifi"></i>
+                            <span>Connected</span>
+                        </div>
+                    </div>
+                    <div class="status-card">
+                        <div class="status-indicator" id="tamperStatus">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Secure</span>
+                        </div>
+                    </div>
+                    <div class="status-card">
+                        <div class="status-indicator" id="meterHealth">
+                            <i class="fas fa-heart"></i>
+                            <span>Healthy</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Charts -->
+                <div class="charts-section">
+                    <div class="chart-container">
+                        <h3>Real-time Power Consumption (Last Hour)</h3>
+                        <canvas id="realtimeChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Load Profile (24 Hours)</h3>
+                        <canvas id="loadProfileChart"></canvas>
+                    </div>
+                    <div class="chart-container" style="grid-column: 1 / -1;">
+                        <h3>Ideal vs Actual Energy Usage</h3>
+                        <div class="chart-controls">
+                            <button class="btn-small" onclick="toggleIdealChart('daily')" id="dailyBtn">Daily</button>
+                            <button class="btn-small active" onclick="toggleIdealChart('weekly')" id="weeklyBtn">Weekly</button>
+                            <button class="btn-small" onclick="toggleIdealChart('monthly')" id="monthlyBtn">Monthly</button>
+                        </div>
+                        <canvas id="idealChart"></canvas>
+                        <div class="chart-legend">
+                            <div class="legend-item">
+                                <span class="legend-color ideal"></span>
+                                <span>Ideal Usage</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color actual"></span>
+                                <span>Actual Usage</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color savings"></span>
+                                <span>Potential Savings</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Usage Efficiency Insights -->
+                <div class="efficiency-insights">
+                    <h3>Energy Efficiency Insights</h3>
+                    <div class="insights-grid">
+                        <div class="insight-card">
+                            <i class="fas fa-lightbulb"></i>
+                            <h4>This Week's Efficiency</h4>
+                            <span class="efficiency-score">87%</span>
+                            <p>You're using 13% more than the ideal consumption pattern</p>
+                        </div>
+                        <div class="insight-card">
+                            <i class="fas fa-chart-line"></i>
+                            <h4>Peak Hour Usage</h4>
+                            <span class="peak-usage">2.1 kW</span>
+                            <p>Consider shifting high-power appliances to off-peak hours</p>
+                        </div>
+                        <div class="insight-card">
+                            <i class="fas fa-coins"></i>
+                            <h4>Potential Monthly Savings</h4>
+                            <span class="potential-savings" id="potentialSavings">$12.50</span>
+                            <p>By following ideal usage patterns</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Insights Section -->
+                <div class="ai-insights">
+                    <h3>✨ AI-Powered Savings Advisor</h3>
+                    <p>Get personalized tips from our AI to help you reduce your energy consumption and lower your monthly bill.</p>
+                    <button class="btn btn-primary" id="getAiTipsBtn" onclick="getAISavingsTips()">
+                        <span id="aiTipsBtnSpinner" class="login-spinner" style="display: none;"></span>
+                        Generate My Energy-Saving Tips
+                    </button>
+                    <div id="aiTipsResult" class="ai-result-container" style="display: none;">
+                        <!-- AI-generated tips will be inserted here -->
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Historical Analysis Section -->
+        <section id="analytics" class="section">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Historical Energy Analysis</h2>
+                    <p>Analyze your energy consumption patterns and optimize your usage</p>
+                </div>
+
+                <!-- Date Range Selector -->
+                <div class="date-selector">
+                    <div class="date-controls">
+                        <label>From:</label>
+                        <input type="date" id="startDate" value="2024-08-01">
+                        <label>To:</label>
+                        <input type="date" id="endDate" value="2024-09-15">
+                        <button class="btn btn-primary" onclick="updateHistoricalData()">
+                            <i class="fas fa-sync"></i> Update Data
+                        </button>
+                        <button class="btn btn-primary" id="generateReportBtn" onclick="generateHistoricalReport()">
+                           <span id="aiReportBtnSpinner" class="login-spinner" style="display: none;"></span>
+                           ✨ Generate AI Summary
+                        </button>
+                    </div>
+                </div>
+                
+                 <!-- AI Report Section -->
+                <div id="aiReportResult" class="ai-report" style="display: none; margin-bottom: 2rem;">
+                    <h3>✨ AI-Generated Consumption Report</h3>
+                    <div id="aiReportContent" class="ai-result-container">
+                        <!-- AI-generated report will be inserted here -->
+                    </div>
+                </div>
+
+
+                <!-- Historical Charts -->
+                <div class="analytics-grid">
+                    <div class="chart-card full-width">
+                        <h3>Energy Consumption Trend</h3>
+                        <canvas id="consumptionTrendChart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Monthly Comparison</h3>
+                        <canvas id="monthlyComparisonChart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Daily Usage Pattern</h3>
+                        <canvas id="dailyPatternChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Data Table -->
+                <div class="data-table-container">
+                    <h3>Detailed Consumption Data</h3>
+                    <div class="table-controls">
+                        <input type="text" id="tableSearch" placeholder="Search...">
+                        <select id="tableFilter">
+                            <option value="all">All Records</option>
+                            <option value="high">High Usage (>10 kWh)</option>
+                            <option value="normal">Normal Usage</option>
+                        </select>
+                    </div>
+                    <table id="consumptionTable">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Energy (kWh)</th>
+                                <th>Peak Demand (kW)</th>
+                                <th>Avg Power Factor</th>
+                                <th>Cost ($)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <!-- Data will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Billing & Payments Section -->
+        <section id="billing" class="section">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Billing & Payments</h2>
+                    <p>Manage your electricity bills and payment history</p>
+                </div>
+
+                <!-- Current Bill Summary -->
+                <div class="current-bill">
+                    <div class="bill-card">
+                        <div class="bill-header">
+                            <h3>Current Month Bill</h3>
+                            <span class="bill-status pending">Pending</span>
+                        </div>
+                        <div class="bill-amount" id="currentBillAmount">$54.78</div>
+                        <div class="bill-details">
+                            <div class="bill-item">
+                                <span>Energy Consumed:</span>
+                                <span>274.2 kWh</span>
+                            </div>
+                            <div class="bill-item">
+                                <span>Rate:</span>
+                                <span id="currentRate">$0.20 per kWh</span>
+                            </div>
+                            <div class="bill-item">
+                                <span>Due Date:</span>
+                                <span>September 30, 2024</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary pay-btn" onclick="openPaymentModal()">
+                            <i class="fas fa-credit-card"></i> Pay Now
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quick Calculator -->
+                <div class="calculator-section">
+                    <h3>Bill Calculator</h3>
+                    <div class="calculator-grid">
+                        <div class="calc-input">
+                            <label>Units (kWh):</label>
+                            <input type="number" id="calcUnits" placeholder="150" step="0.1">
+                        </div>
+                        <div class="calc-input">
+                            <label id="rateLabel">Rate ($/kWh):</label>
+                            <input type="number" id="calcRate" placeholder="0.20" step="0.01">
+                        </div>
+                        <div class="calc-result">
+                            <label>Estimated Bill:</label>
+                            <div class="calc-amount" id="calcResult">$0.00</div>
+                        </div>
+                        <button class="btn btn-secondary" onclick="calculateBillEstimate()" id="calculateBtn">
+                            <i class="fas fa-calculator"></i> Calculate
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Billing History -->
+                <div class="billing-history">
+                    <h3>Billing History</h3>
+                    <div class="history-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Month</th>
+                                    <th>Units (kWh)</th>
+                                    <th>Amount ($)</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr data-month="August 2024" data-units="245.7" data-amount="49.14">
+                                    <td>August 2024</td>
+                                    <td>245.7</td>
+                                    <td>$49.14</td>
+                                    <td><span class="status paid">Paid</span></td>
+                                    <td>
+                                        <button class="btn-small" onclick="analyzeBillSpike(this.parentElement.parentElement)">✨ Analyze Bill</button>
+                                    </td>
+                                </tr>
+                                <tr data-month="July 2024" data-units="267.3" data-amount="53.46">
+                                    <td>July 2024</td>
+                                    <td>267.3</td>
+                                    <td>$53.46</td>
+                                    <td><span class="status paid">Paid</span></td>
+                                    <td>
+                                       <button class="btn-small" onclick="analyzeBillSpike(this.parentElement.parentElement)">✨ Analyze Bill</button>
+                                    </td>
+                                </tr>
+                                <tr data-month="June 2024" data-units="298.1" data-amount="59.62">
+                                    <td>June 2024</td>
+                                    <td>298.1</td>
+                                    <td>$59.62</td>
+                                    <td><span class="status paid">Paid</span></td>
+                                    <td>
+                                        <button class="btn-small" onclick="analyzeBillSpike(this.parentElement.parentElement)">✨ Analyze Bill</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Bill Analysis Modal -->
+        <div id="billAnalysisModal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal" onclick="closeModal('billAnalysisModal')">&times;</span>
+                <h2 id="billAnalysisModalTitle">AI Bill Analysis</h2>
+                <div id="billAnalysisModalBody" class="modal-body">
+                    <!-- AI-generated analysis will be inserted here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Other sections like Alerts, Users, Settings would go here -->
+         <!-- Alerts & Notifications Section -->
+    <section id="alerts" class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Alerts & Notifications</h2>
+                <p>Configure alerts and view notification history</p>
+            </div>
+
+            <!-- Active Alerts -->
+            <div class="active-alerts">
+                <h3>Active Alerts</h3>
+                <div class="alert-item high">
+                    <div class="alert-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="alert-content">
+                        <h4>High Power Consumption</h4>
+                        <p>Current usage is 45% above your monthly average</p>
+                        <span class="alert-time">2 hours ago</span>
+                    </div>
+                    <button class="btn btn-primary btn-small" onclick="getAlertActionPlan(this)">
+                         <span class="login-spinner" style="display: none;"></span>
+                        ✨ Get Action Plan
+                    </button>
+                </div>
+                 <div id="alertActionPlanResult" class="ai-result-container" style="display: none; margin-top: 1rem;">
+                    <!-- AI-generated action plan will be inserted here -->
+                </div>
+            </div>
+
+            <!-- Alert Configuration -->
+            <div class="alert-config">
+                <h3>Configure Alerts</h3>
+                <div class="config-grid">
+                    <div class="config-card">
+                        <h4><i class="fas fa-bolt"></i> High Consumption Alert</h4>
+                        <div class="config-item">
+                            <label>Threshold (kWh per day):</label>
+                            <input type="number" id="highConsumptionThreshold" value="15" step="0.5">
+                        </div>
+                        <button class="btn btn-primary" onclick="showNotification('High consumption alert saved!', 'success')">
+                            <i class="fas fa-save"></i> Save
+                        </button>
+                    </div>
+
+                    <div class="config-card">
+                        <h4><i class="fas fa-power-off"></i> Power Outage Alert</h4>
+                        <div class="config-item">
+                            <label>Detection Sensitivity:</label>
+                            <select id="outagesensitivity">
+                                <option value="low">Low (>5 min outage)</option>
+                                <option value="medium" selected>Medium (>2 min outage)</option>
+                                <option value="high">High (>30 sec outage)</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" onclick="showNotification('Power outage alert saved!', 'success')">
+                            <i class="fas fa-save"></i> Save
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- User Management Section (Admin Only) -->
+    <section id="users" class="section admin-only">
+        <div class="container">
+            <div class="section-header">
+                <h2>User Management</h2>
+                <p>Manage system users and their permissions</p>
+            </div>
+            <div class="users-table">
+                <h3>System Users</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <tr>
+                            <td>admin</td>
+                            <td>admin@smartmeter.com</td>
+                            <td><span class="role admin">Administrator</span></td>
+                            <td><span class="status active">Active</span></td>
+                            <td>
+                                <button class="btn-small danger" onclick="showNotification('User deletion is disabled in demo.', 'warning')">Delete</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>user</td>
+                            <td>user@example.com</td>
+                            <td><span class="role user">User</span></td>
+                            <td><span class="status active">Active</span></td>
+                             <td>
+                                <button class="btn-small danger" onclick="showNotification('User deletion is disabled in demo.', 'warning')">Delete</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>tech</td>
+                            <td>tech@smartmeter.com</td>
+                            <td><span class="role technician">Technician</span></td>
+                            <td><span class="status inactive">Inactive</span></td>
+                            <td>
+                                <button class="btn-small danger" onclick="showNotification('User deletion is disabled in demo.', 'warning')">Delete</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Settings Section -->
+    <section id="settings" class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2>System Settings</h2>
+                <p>Configure your smart meter system preferences</p>
+            </div>
+
+            <div class="settings-grid">
+                <!-- Profile Settings -->
+                <div class="settings-card">
+                    <h3><i class="fas fa-user"></i> Profile Settings</h3>
+                    <div class="setting-item">
+                        <label>Full Name:</label>
+                        <input type="text" id="fullName" value="John Doe">
+                    </div>
+                    <div class="setting-item">
+                        <label>Email:</label>
+                        <input type="email" id="email" value="john.doe@example.com">
+                    </div>
+                    <button class="btn btn-primary" onclick="showNotification('Profile updated!', 'success')">
+                        <i class="fas fa-save"></i> Save Profile
+                    </button>
+                </div>
+
+                <!-- System Preferences -->
+                <div class="settings-card">
+                    <h3><i class="fas fa-cogs"></i> System Preferences</h3>
+                    <div class="setting-item">
+                        <label>Currency:</label>
+                        <select id="currency" onchange="updateCurrency()">
+                            <option value="USD" selected>USD ($)</option>
+                            <option value="INR">INR (₹)</option>
+                            <option value="EUR">EUR (€)</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label>Data Update Interval (sec):</label>
+                        <select id="updateInterval">
+                            <option value="1">1 second</option>
+                            <option value="5" selected>5 seconds</option>
+                            <option value="10">10 seconds</option>
+                        </select>
+                    </div>
+                     <button class="btn btn-primary" onclick="showNotification('Preferences saved!', 'success')">
+                        <i class="fas fa-save"></i> Save Preferences
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+        <!-- Data Status Footer -->
+        <div class="data-status-footer">
+            <div class="status-container">
+                <div class="data-info">
+                    <div class="data-item">
+                        <i class="fas fa-clock"></i>
+                        <span>Last Update: <span id="footerLastUpdate">--</span></span>
+                    </div>
+                    <div class="data-item">
+                        <i class="fas fa-wifi" id="connectionIcon"></i>
+                        <span>Status: <span id="connectionStatus">Connected</span></span>
+                    </div>
+                    <div class="data-item">
+                        <i class="fas fa-database"></i>
+                        <span>Source: Smart Meter #SM001</span>
+                    </div>
+                    <div class="data-item">
+                        <i class="fas fa-sync-alt" id="syncIcon"></i>
+                        <span>Next Sync: <span id="nextSync">--</span></span>
+                    </div>
+                </div>
+                <div class="data-quality">
+                    <span class="quality-indicator" id="dataQuality">Data Quality: Excellent</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <div class="footer-content">
+                    <div class="footer-logo">
+                        <i class="fas fa-bolt"></i>
+                        <span>Smart Electricity Meter</span>
+                    </div>
+                    <p>&copy; 2024 Smart Electricity Meter Project. Accurate, Safe, Secure, and Placement-Ready.</p>
+                </div>
+            </div>
+        </footer>
+    
+    </div> <!-- End Main App -->
+
+<script>
+// =================================================================================
+// SCRIPT.JS - REFACTORED AND WITH GEMINI API INTEGRATION
+// =================================================================================
+
+// --- GLOBAL STATE & VARIABLES ---
+let currentCurrency = 'USD';
+const currencyRates = { USD: 1, INR: 83.12, EUR: 0.92 };
+let currentUser = null;
+let updateIntervalId = null;
+
+// Chart instances
+let voltageGauge, currentGauge, powerGauge, powerFactorGauge;
+let realtimeChart, loadProfileChart, idealChartInstance;
+let consumptionTrendChart, monthlyComparisonChart, dailyPatternChart;
+
+
+// --- INITIALIZATION ---
+
+document.addEventListener('DOMContentLoaded', function() {
+    localStorage.removeItem('smartMeterAuth');
+    initializeNavigation();
+    initializeMobileMenu();
+    animateMeterDisplay();
+    document.getElementById('loginModal').style.display = 'block';
+    document.getElementById('mainApp').style.display = 'none';
+});
+
+function animateMeterDisplay() {
+    const powerReading = document.querySelector('.power-reading');
+    const dots = document.querySelectorAll('.dot');
+    
+    if (powerReading) {
+        setInterval(() => {
+            let reading = 1.23 + (Math.random() - 0.5) * 0.5;
+            powerReading.textContent = reading.toFixed(2);
+        }, 2000);
+    }
+    
+    if (dots.length > 0) {
+        setInterval(() => {
+            dots.forEach(dot => dot.classList.toggle('active', Math.random() > 0.5));
+        }, 1500);
+    }
+}
+
+
+// --- AUTHENTICATION & LOGIN ---
+
+function handleLoginSubmit(event) {
+    event.preventDefault(); 
+
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+    const userRole = document.getElementById('userRole').value;
+    const loginBtn = document.getElementById('loginBtn');
+    const loginBtnText = document.getElementById('loginBtnText');
+    const loginSpinner = document.getElementById('loginSpinner');
+    const loginAttemptsDiv = document.getElementById('loginAttempts');
+    const attemptsText = document.getElementById('attemptsText');
+    
+    if (!username || !password || !userRole) {
+        attemptsText.textContent = 'Please fill in all fields.';
+        loginAttemptsDiv.style.display = 'flex';
+        return false;
+    }
+
+    loginBtn.disabled = true;
+    loginBtnText.textContent = 'Authenticating...';
+    loginSpinner.style.display = 'inline-block';
+    loginAttemptsDiv.style.display = 'none';
+
+    setTimeout(() => {
+        let isAuthenticated = false;
+
+        if ((userRole === 'admin' && username === 'admin' && password === 'admin123') ||
+            (userRole === 'user' && username === 'user' && password === 'password') ||
+            (userRole === 'technician' && username === 'tech' && password === 'tech123')) {
+            isAuthenticated = true;
+        }
+
+        if (isAuthenticated) {
+            console.log('Login successful!');
+            currentUser = { username: username, role: userRole };
+            
+            localStorage.setItem('smartMeterAuth', JSON.stringify({
+                user: currentUser,
+                loginTime: Date.now()
+            }));
+
+            document.getElementById('loginModal').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+
+            updateUserInfo();
+            
+             setTimeout(() => {
+                initializeAllChartsAndGauges();
+                startRealTimeUpdates();
+                updateTimestamps();
+                initializeDailyUsageMonitoring();
+                updateAllPrices();
+                showSection('dashboard');
+            }, 100);
+
+        } else {
+            console.log('Login failed!');
+            attemptsText.textContent = 'Invalid username, password, or role. Please try again.';
+            loginAttemptsDiv.style.display = 'flex';
+        }
+
+        loginBtn.disabled = false;
+        loginBtnText.textContent = 'Secure Login';
+        loginSpinner.style.display = 'none';
+        
+    }, 1000);
+
+    return false;
+}
+
+function togglePassword() {
+    const passwordInput = document.getElementById('password');
+    const toggleIcon = document.getElementById('passwordToggleIcon');
+    const isPassword = passwordInput.type === 'password';
+    passwordInput.type = isPassword ? 'text' : 'password';
+    toggleIcon.className = `fas ${isPassword ? 'fa-eye-slash' : 'fa-eye'}`;
+}
+
+function updateUserInfo() {
+    if (currentUser) {
+        document.getElementById('userName').textContent = currentUser.username;
+        document.getElementById('navUserRole').textContent = currentUser.role;
+        document.getElementById('userInfo').style.display = 'flex';
+        
+        document.querySelectorAll('.admin-only').forEach(el => {
+            el.style.display = currentUser.role === 'admin' ? 'block' : 'none';
+        });
+    }
+}
+
+function logout() {
+    currentUser = null;
+    localStorage.removeItem('smartMeterAuth');
+    clearInterval(updateIntervalId);
+
+    document.getElementById('mainApp').style.display = 'none';
+    document.getElementById('loginModal').style.display = 'block';
+
+    document.getElementById('userInfo').style.display = 'none';
+    document.getElementById('loginForm').reset();
+}
+
+
+// --- NAVIGATION & UI ---
+
+function initializeNavigation() {
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetSection = this.getAttribute('data-section');
+            showSection(targetSection);
+            
+            navLinks.forEach(nl => nl.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+}
+
+function showSection(sectionName) {
+    document.querySelectorAll('.section').forEach(section => {
+        section.classList.remove('active');
+    });
+    
+    const targetSection = document.getElementById(sectionName);
+    if (targetSection) {
+        targetSection.classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+}
+
+function initializeMobileMenu() {
+    const hamburger = document.querySelector('.hamburger');
+    const navMenu = document.querySelector('.nav-menu');
+    
+    if (hamburger && navMenu) {
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+        });
+        
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                hamburger.classList.remove('active');
+                navMenu.classList.remove('active');
+            });
+        });
+    }
+}
+
+function showNotification(message, type = 'info') {
+    const colors = {
+        success: '#28a745',
+        error: '#dc3545',
+        info: '#17a2b8',
+        warning: '#ffc107'
+    };
+    const notification = document.createElement('div');
+    notification.textContent = message;
+    notification.style.cssText = `
+        position: fixed; top: 20px; right: 20px;
+        background: ${colors[type] || colors.info};
+        color: white; padding: 1rem 1.5rem; border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        z-index: 10001; font-weight: 500;
+        animation: slideInRight 0.4s ease-out;
+    `;
+    document.body.appendChild(notification);
+    setTimeout(() => {
+        notification.style.animation = 'slideOutRight 0.4s ease-in';
+        setTimeout(() => notification.remove(), 400);
+    }, 4000);
+}
+
+
+// --- GEMINI API INTEGRATION ---
+
+/**
+ * Generic function to call the Gemini API.
+ * @param {string} userQuery - The specific prompt for the user's request.
+ * @param {string} systemPrompt - The system instruction to guide the AI's persona and task.
+ * @returns {Promise<string>} The text response from the API.
+ */
+async function callGeminiAPI(userQuery, systemPrompt) {
+    const apiKey = ""; // API key is handled by the environment
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+    const payload = {
+        contents: [{ parts: [{ text: userQuery }] }],
+        systemInstruction: { parts: [{ text: systemPrompt }] },
+    };
+
+    const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+        throw new Error(`API error: ${response.status} ${response.statusText}`);
+    }
+
+    const result = await response.json();
+    const candidate = result.candidates?.[0];
+
+    if (candidate && candidate.content?.parts?.[0]?.text) {
+        return candidate.content.parts[0].text;
+    } else {
+        throw new Error("Received an invalid response from the AI.");
+    }
+}
+
+
+/**
+ * Fetches energy-saving tips from the Gemini API based on dashboard data.
+ */
+async function getAISavingsTips() {
+    const btn = document.getElementById('getAiTipsBtn');
+    const spinner = document.getElementById('aiTipsBtnSpinner');
+    const resultContainer = document.getElementById('aiTipsResult');
+
+    btn.disabled = true;
+    spinner.style.display = 'inline-block';
+    resultContainer.style.display = 'none';
+    resultContainer.innerHTML = '';
+
+    const efficiency = document.getElementById('efficiency').textContent;
+    const peakHours = document.getElementById('peakHours').textContent;
+    const peakDemand = document.getElementById('peakDemand').textContent;
+    const potentialSavings = document.getElementById('potentialSavings').textContent;
+
+    const userQuery = `
+        Based on this data, provide three distinct, actionable, and personalized tips to help me reduce my electricity bill.
+        - My energy efficiency score is ${efficiency}.
+        - My peak usage hours are from ${peakHours}.
+        - My peak demand was ${peakDemand} kW.
+        - My estimated potential monthly savings are ${potentialSavings}.
+        For each tip, use the format: **Tip Title:** Explanation.`;
+    
+    const systemPrompt = "You are an expert in home energy efficiency. Your goal is to provide clear, simple, and encouraging advice. Format your response using Markdown.";
+
+    try {
+        const generatedText = await callGeminiAPI(userQuery, systemPrompt);
+        displayFormattedTips(generatedText, resultContainer, 'Your Personalized Savings Plan');
+    } catch (error) {
+        handleAPIError(error, resultContainer);
+    } finally {
+        btn.disabled = false;
+        spinner.style.display = 'none';
+    }
+}
+
+
+/**
+ * Generates a natural language summary of historical energy usage.
+ */
+async function generateHistoricalReport() {
+    const btn = document.getElementById('generateReportBtn');
+    const spinner = document.getElementById('aiReportBtnSpinner');
+    const resultContainer = document.getElementById('aiReportResult');
+    const contentContainer = document.getElementById('aiReportContent');
+
+    btn.disabled = true;
+    spinner.style.display = 'inline-block';
+    resultContainer.style.display = 'none';
+    contentContainer.innerHTML = '';
+
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+    const monthlyData = consumptionTrendChart.data.datasets[0].data;
+    const months = consumptionTrendChart.data.labels;
+    const dataString = months.map((month, i) => `${month}: ${monthlyData[i]} kWh`).join(', ');
+
+    const userQuery = `
+        Analyze the following monthly energy consumption data for a homeowner for the period ${startDate} to ${endDate}.
+        Data: ${dataString}.
+        Provide a concise, one-paragraph summary. Highlight the month with the highest consumption, the lowest, and identify any clear trends (e.g., increasing usage in summer).`;
+
+    const systemPrompt = "You are a data analyst specializing in energy consumption. Summarize data clearly and concisely for a non-technical audience.";
+    
+    try {
+        const generatedText = await callGeminiAPI(userQuery, systemPrompt);
+        contentContainer.innerHTML = `<p>${generatedText.replace(/\n/g, '<br>')}</p>`;
+        resultContainer.style.display = 'block';
+    } catch (error) {
+       handleAPIError(error, contentContainer, true);
+    } finally {
+        btn.disabled = false;
+        spinner.style.display = 'none';
+    }
+}
+
+
+/**
+ * Analyzes a specific bill, comparing it to the previous month to explain potential reasons for a high bill.
+ */
+async function analyzeBillSpike(rowElement) {
+    const modal = document.getElementById('billAnalysisModal');
+    const modalBody = document.getElementById('billAnalysisModalBody');
+    const modalTitle = document.getElementById('billAnalysisModalTitle');
+
+    const month = rowElement.dataset.month;
+    const units = rowElement.dataset.units;
+    const previousRow = rowElement.previousElementSibling;
+
+    if (!previousRow) {
+        showNotification("No previous month's data available for comparison.", 'warning');
+        return;
+    }
+
+    const prevMonth = previousRow.dataset.month;
+    const prevUnits = previousRow.dataset.units;
+    
+    modalTitle.textContent = `AI Analysis for ${month}`;
+    modalBody.innerHTML = `<div style="text-align: center;"><div class="login-spinner"></div><p>Analyzing your bill...</p></div>`;
+    modal.classList.add('active');
+
+    const userQuery = `
+        My electricity bill for ${month} seems high. My consumption was ${units} kWh.
+        In the previous month, ${prevMonth}, my consumption was ${prevUnits} kWh.
+        The current season in India is post-monsoon / early autumn.
+        Provide three likely and distinct reasons for this increase in electricity usage. Be specific and practical.
+        Format the response as a simple bulleted list.`;
+
+    const systemPrompt = "You are a helpful assistant for a smart meter app. Explain billing changes in simple terms, considering seasonal factors in India.";
+    
+    try {
+        const generatedText = await callGeminiAPI(userQuery, systemPrompt);
+        // Basic markdown to HTML conversion for lists
+        let htmlContent = generatedText
+            .replace(/\*\s/g, '<li>')
+            .replace(/\n/g, '</li>');
+        modalBody.innerHTML = `<h4>Potential Reasons for Higher Usage:</h4><ul>${htmlContent}</ul>`;
+    } catch (error) {
+        handleAPIError(error, modalBody);
+    }
+}
+
+
+/**
+ * Gets a step-by-step action plan for a specific alert.
+ */
+async function getAlertActionPlan(buttonElement) {
+    const alertItem = buttonElement.closest('.alert-item');
+    const spinner = buttonElement.querySelector('.login-spinner');
+    const resultContainer = document.getElementById('alertActionPlanResult');
+    
+    buttonElement.disabled = true;
+    spinner.style.display = 'inline-block';
+    resultContainer.style.display = 'none';
+
+    const alertTitle = alertItem.querySelector('h4').textContent;
+    const alertDetails = alertItem.querySelector('p').textContent;
+
+    const userQuery = `I received this smart meter alert: "${alertTitle}: ${alertDetails}". Provide a simple, 3-step action plan I can take right now to address this.`;
+    const systemPrompt = "You provide immediate, clear, and calming action steps for smart home alerts. Use a numbered list for the plan.";
+    
+    try {
+        const generatedText = await callGeminiAPI(userQuery, systemPrompt);
+        // Simple markdown to HTML for numbered lists
+        let htmlContent = generatedText
+            .replace(/(\d\.)\s/g, '<li>')
+            .replace(/\n/g, '</li>');
+        resultContainer.innerHTML = `<h4>Your Action Plan:</h4><ol>${htmlContent}</ol>`;
+        resultContainer.style.display = 'block';
+    } catch (error) {
+        handleAPIError(error, resultContainer);
+    } finally {
+        buttonElement.disabled = false;
+        spinner.style.display = 'none';
+    }
+}
+
+/**
+ * Parses Markdown tips and displays them in a container.
+ */
+function displayFormattedTips(markdownText, container, header) {
+    let htmlContent = `<h4>${header}</h4><ul>`;
+    const tips = markdownText.split('**').filter(part => part.trim() !== '');
+    
+    for (let i = 0; i < tips.length; i += 2) {
+        const title = tips[i].replace(/Tip Title:|:/g, '').trim();
+        const explanation = tips[i+1] ? tips[i+1].trim().replace(/\n/g, '<br>') : 'No explanation.';
+        if(title) {
+            htmlContent += `<li><strong>${title}</strong><p>${explanation}</p></li>`;
+        }
+    }
+    
+    container.innerHTML = htmlContent + '</ul>';
+    container.style.display = 'block';
+}
+
+/**
+ * Handles errors from the API calls and displays a message.
+ */
+function handleAPIError(error, container, isReport = false) {
+    console.error("Error with Gemini API:", error);
+    container.innerHTML = `<p style="color: var(--danger-color);">Sorry, the AI feature is currently unavailable. Please try again later.</p>`;
+    if (isReport) {
+        document.getElementById('aiReportResult').style.display = 'block';
+    } else {
+       container.style.display = 'block';
+    }
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).classList.remove('active');
+}
+
+
+// --- REAL-TIME DATA & UPDATES ---
+
+function startRealTimeUpdates() {
+    clearInterval(updateIntervalId);
+    updateIntervalId = setInterval(() => {
+        updateDashboardValues();
+        updateRealtimeChart();
+        updateTimestamps();
+    }, 2000);
+}
+
+function updateDashboardValues() {
+    const voltage = 238 + Math.random() * 4;
+    const current = 5.5 + (Math.random() - 0.5) * 2;
+    const power = (voltage * current) / 1000;
+    const powerFactor = 0.9 + Math.random() * 0.08;
+    const frequency = 49.95 + Math.random() * 0.1;
+
+    document.getElementById('voltageValue').textContent = voltage.toFixed(1);
+    document.getElementById('currentValue').textContent = current.toFixed(1);
+    document.getElementById('powerValue').textContent = power.toFixed(2);
+    document.getElementById('powerFactorValue').textContent = powerFactor.toFixed(2);
+    document.getElementById('frequencyValue').textContent = frequency.toFixed(2);
+
+    if (voltageGauge) {
+        voltageGauge.data.datasets[0].data = [voltage - 220, 260 - voltage];
+        voltageGauge.update('none');
+    }
+    if (currentGauge) {
+        currentGauge.data.datasets[0].data = [current, 20 - current];
+        currentGauge.update('none');
+    }
+    if (powerGauge) {
+        powerGauge.data.datasets[0].data = [power, 5 - power];
+        powerGauge.update('none');
+    }
+    if (powerFactorGauge) {
+        powerFactorGauge.data.datasets[0].data = [powerFactor, 1 - powerFactor];
+        powerFactorGauge.update('none');
+    }
+}
+
+function updateRealtimeChart() {
+    if (realtimeChart && realtimeChart.data.datasets[0].data.length >= 0) {
+        const timeLabel = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        const newPower = parseFloat(document.getElementById('powerValue').textContent);
+
+        realtimeChart.data.labels.push(timeLabel);
+        realtimeChart.data.datasets[0].data.push(newPower);
+
+        if (realtimeChart.data.labels.length > 30) {
+            realtimeChart.data.labels.shift();
+            realtimeChart.data.datasets[0].data.shift();
+        }
+        realtimeChart.update('none');
+    }
+}
+
+
+// --- CHART INITIALIZATION (using Chart.js) ---
+
+function initializeAllChartsAndGauges() {
+    const gaugeOptions = (max, color) => ({
+        type: 'doughnut',
+        data: {
+            datasets: [{
+                data: [0, max],
+                backgroundColor: [color, '#e9ecef'],
+                borderWidth: 0,
+                circumference: 270,
+                rotation: 225,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            cutout: '80%',
+            plugins: { tooltip: { enabled: false }, legend: { display: false } },
+        }
+    });
+
+    voltageGauge = new Chart(document.getElementById('voltageGauge'), gaugeOptions(40, '#007bff'));
+    currentGauge = new Chart(document.getElementById('currentGauge'), gaugeOptions(20, '#17a2b8'));
+    powerGauge = new Chart(document.getElementById('powerGauge'), gaugeOptions(5, '#28a745'));
+    powerFactorGauge = new Chart(document.getElementById('powerFactorGauge'), gaugeOptions(1, '#ffc107'));
+
+    const lineChartOptions = (title) => ({
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: { y: { beginAtZero: true } },
+    });
+    
+    realtimeChart = new Chart(document.getElementById('realtimeChart'), {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Power (kW)', data: [], borderColor: 'rgba(0, 123, 255, 1)',
+                backgroundColor: 'rgba(0, 123, 255, 0.1)', fill: true, tension: 0.3
+            }]
+        }, options: lineChartOptions()
+    });
+
+    loadProfileChart = new Chart(document.getElementById('loadProfileChart'), {
+        type: 'line',
+        data: {
+            labels: Array.from({ length: 24 }, (_, i) => `${i}:00`),
+            datasets: [{
+                label: 'Usage (kW)', data: [0.3,0.2,0.2,0.2,0.3,0.5,0.8,1.2,1.1,1.0,0.9,1.0,1.1,1.0,1.2,1.5,1.8,2.2,2.5,2.3,1.8,1.2,0.8,0.4],
+                borderColor: 'rgba(23, 162, 184, 1)', backgroundColor: 'rgba(23, 162, 184, 0.1)', fill: true
+            }]
+        }, options: lineChartOptions()
+    });
+    
+    idealChartInstance = new Chart(document.getElementById('idealChart'), {
+        type: 'line', data: { labels: [], datasets: [
+                { label: 'Actual Usage', data: [], borderColor: 'rgba(0, 123, 255, 1)', backgroundColor: 'rgba(0, 123, 255, 0.1)', fill: true },
+                { label: 'Ideal Usage', data: [], borderColor: 'rgba(40, 167, 69, 1)', backgroundColor: 'rgba(40, 167, 69, 0.1)', fill: true }
+            ]}, options: lineChartOptions()
+    });
+    toggleIdealChart('weekly');
+
+    consumptionTrendChart = new Chart(document.getElementById('consumptionTrendChart'), {
+        type: 'bar', data: { labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
+            datasets: [{ label: 'kWh', data: [320, 310, 340, 330, 360, 380, 410, 390], backgroundColor: '#007bff' }]
+        }, options: lineChartOptions()
+    });
+
+    monthlyComparisonChart = new Chart(document.getElementById('monthlyComparisonChart'), {
+        type: 'bar', data: { labels: ['Last Year', 'This Year'],
+            datasets: [{ label: 'August kWh', data: [420, 390], backgroundColor: ['#6c757d', '#28a745'] }]
+        }, options: lineChartOptions()
+    });
+
+    dailyPatternChart = new Chart(document.getElementById('dailyPatternChart'), {
+        type: 'radar', data: { labels: ['Morning', 'Afternoon', 'Evening', 'Night'],
+            datasets: [{ label: 'Avg. Usage', data: [1.2, 1.8, 2.4, 0.4], backgroundColor: 'rgba(255, 193, 7, 0.2)', borderColor: '#ffc107' }]
+        }, options: { responsive: true, maintainAspectRatio: false }
+    });
+}
+
+
+// --- MISCELLANEOUS & UTILITY FUNCTIONS ---
+
+function updateTimestamps() {
+    const timestamp = new Date().toLocaleString();
+    const nextSyncTime = new Date(Date.now() + 2000).toLocaleTimeString();
+    document.getElementById('lastUpdated').textContent = timestamp;
+    document.getElementById('footerLastUpdate').textContent = timestamp;
+    document.getElementById('nextSync').textContent = nextSyncTime;
+}
+
+function initializeDailyUsageMonitoring() {
+    document.getElementById('dailyUsage').textContent = `18.7 kWh`;
+    document.getElementById('peakHours').textContent = `19:00 - 21:00`;
+}
+
+function toggleIdealChart(period) {
+    document.querySelectorAll('.chart-controls .btn-small').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(`${period}Btn`).classList.add('active');
+
+    const data = {
+        daily: { labels: Array.from({ length: 12 }, (_, i) => `${i * 2}:00`), actual: [0.4, 0.3, 0.6, 1.2, 1.0, 1.3, 1.5, 2.0, 2.8, 2.2, 1.5, 0.8], ideal: [0.3, 0.2, 0.4, 1.0, 0.8, 1.0, 1.2, 1.6, 2.2, 1.8, 1.2, 0.6] },
+        weekly: { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], actual: [18, 19, 17, 20, 21, 24, 23], ideal: [16, 16, 15, 17, 18, 20, 20] },
+        monthly: { labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], actual: [340, 320, 360, 350, 390, 420], ideal: [310, 300, 320, 320, 350, 380] }
+    };
+
+    idealChartInstance.data.labels = data[period].labels;
+    idealChartInstance.data.datasets[0].data = data[period].actual;
+    idealChartInstance.data.datasets[1].data = data[period].ideal;
+    idealChartInstance.update();
+}
+
+function toggleCurrency() {
+    currentCurrency = currentCurrency === 'USD' ? 'INR' : 'USD';
+    updateAllPrices();
+}
+function updateCurrency() {
+    currentCurrency = document.getElementById('currency').value;
+    updateAllPrices();
+}
+
+function updateAllPrices() {
+    document.getElementById('currencyBtn').textContent = currentCurrency === 'USD' ? 'Switch to ₹' : 'Switch to $';
+    const elementsToUpdate = [
+        { id: 'estimatedBill', baseAmount: 49.14 },
+        { id: 'potentialSavings', baseAmount: 12.50 },
+        { id: 'currentBillAmount', baseAmount: 54.78 }
+    ];
+    elementsToUpdate.forEach(item => {
+        const el = document.getElementById(item.id);
+        if(el) el.textContent = formatPrice(convertPrice(item.baseAmount));
+    });
+}
+
+function convertPrice(baseAmountUSD) {
+    return baseAmountUSD * currencyRates[currentCurrency];
+}
+
+function formatPrice(amount) {
+    const symbols = { USD: '$', INR: '₹', EUR: '€' };
+    const symbol = symbols[currentCurrency] || '$';
+    const decimals = currentCurrency === 'INR' ? 0 : 2;
+    return `${symbol}${amount.toLocaleString('en-IN', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}`;
+}
+
+function calculateBillEstimate() {
+    const units = parseFloat(document.getElementById('calcUnits').value) || 0;
+    const rate = parseFloat(document.getElementById('calcRate').value) || 0;
+    const resultEl = document.getElementById('calcResult');
+
+    if (units > 0 && rate > 0) {
+        const totalBillUSD = units * rate;
+        resultEl.textContent = formatPrice(convertPrice(totalBillUSD));
+    } else {
+        resultEl.textContent = formatPrice(0);
+    }
+}
+
+// Stubs for unimplemented functions to prevent console errors
+function openPaymentModal() { showNotification('Payment gateway integration is pending.', 'info'); }
+function downloadBill() { showNotification('Bill download initiated.', 'success'); }
+function viewBill() { showNotification('Loading detailed bill view...', 'info'); }
+function updateHistoricalData() { showNotification('Updating historical data...', 'info'); }
+function exportData() { showNotification('Exporting data as CSV...', 'success'); }
+
+</script>
+
+</body>
+</html>
+
